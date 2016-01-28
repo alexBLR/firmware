@@ -1,0 +1,37 @@
+{
+  "name": "components/bootstrap",
+  "description": "Sleek, intuitive, and powerful front-end framework for faster and easier web development.",
+  "type": "component",
+  "keywords": [
+    "bootstrap",
+    "css"
+  ],
+  "homepage": "http://twitter.github.com/bootstrap/",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Twitter, Inc"
+    }
+  ],
+  "require": {
+    "components/jquery": "*"
+  },
+  "extra": {
+    "component": {
+      "scripts": [
+        "js/bootstrap.js"
+      ],
+      "styles": [
+        "css/bootstrap.css",
+        "css/bootstrap-responsive.css"
+      ],
+      "files": [
+        "img/glyphicons-halflings.png",
+        "img/glyphicons-halflings-white.png"
+      ],
+      "shim": {
+        "deps": ["jquery"]
+      }
+    }
+  }
+}

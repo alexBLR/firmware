@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+{% block title %} Private office {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+    <div class="content">
+        {% include 'menu.html.twig' %}
+        <div style="margin-top: 20px;">
+            <table class="usersTable row-fluid" style="width:880px" id="userTable">
+			<thead>
+                <tr>
+                    <td></td>
+                    <td>Login</td>
+                    <td></td>
+                    <td>Amount in the account</td>
+                    <td>Status</td>
+                    <td>Group</td>
+                    <td></td>
+                </tr>
+				</thead>
+				<tbody>
+                {% for item in users %}
+                    <tr class="tableTr" data-id="{{ item.id }}">
+						<td>
+							{% if item.pays == 1 %}
+							{{ item.paySumm }}
+							<img src="/images/details_open.png">
+							{% endif %}
+						</td>
+                        <td>{{ item.login }}
+                        </td>
+                        <td>
+                            {% if item.credit == 0 %}
+                            <a href="#" class="btn" rel="popover" data-placement="right"
+                               data-content="<form method='post' action='/users/setCredit' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/><input type='text' name='amount'></input><button type='submit' class='btn'>Add</button>"
+                               data-original-title="">Credit</a>
+                            {% else %}
+                                <span>Credit: -{{ item.summaCredit }}</span>
+                                <a href="#" class="btn" rel="popover" data-placement="right"
+                                   data-content="<form method='post' action='/users/deleteCredit' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/></input><button type='submit' class='btn'>Delete credit</button>"
+                                   data-original-title="">Del</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.summa }}$ <a href="#" class="btn" rel="popover" data-placement="right"
+                                                               data-content="<form method='post' action='/users/AddBalance' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/><input type='text' name='amount'></input><button type='submit' class='btn'>Add</button>"
+                                                               data-original-title="">+</a></td>
+                        <td>{{ item.status }}</td>
+                        <td>
+                            <form method='post' action='/users/setGroup'>
+                                <input type='hidden' name='userId' value='{{ item.id }}'/>
+                                <select id="groups" name="groups" style="width:100px">
+                                    {% for group in groups %}
+                                        <option value="{{ group.id }}"  {% if item.group == group.id %} selected {% endif %}>{{ group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type='submit' class='btn'>save</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if item.role != 1 %}
+                            <form method='post' action='/users/deleteUser'>
+                                <input type='hidden' name='userId' value='{{ item.id }}'/>
+                                <button type='submit' class='btn'>Delete</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+				</tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        function fnFormatDetails ( nTr )
+		{
+			var aData = oTable.fnGetData( nTr );
+			var id = $(nTr).data('id');
+			var sOut = '';
+			$.ajax({
+                type: 'POST',
+                url: '/users/getPay',
+				async: false,
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+					sOut = data;
+					
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {id: id}
+            });
+			return sOut;
+		}
+		$(document).ready(function () {
+		
+			oTable = $('#userTable').dataTable({
+				 "bPaginate": false,
+				 "aoColumns": [
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": true },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false }
+				],
+				 "aaSorting": [[1, 'asc']]
+			});
+			
+			$('#userTable tbody td img').live( 'click', function () {
+				var nTr = $(this).parents('tr')[0];
+				if ( oTable.fnIsOpen(nTr) )
+				{
+					/* This row is already open - close it */
+					this.src = "/images/details_open.png";
+					oTable.fnClose( nTr );
+				}
+				else
+				{
+					/* Open this row */
+					this.src = "/images/details_close.png";
+					oTable.fnOpen( nTr, fnFormatDetails(nTr), 'details' );
+				}
+			} );
+			
+            $("a[rel=popover]").popover({ offset: 10, trigger: 'focus', html: true, toggle: 'enabled' }).click(function (e) {
+                e.preventDefault()
+            });
+        });
+    </script>
+{% endblock %}

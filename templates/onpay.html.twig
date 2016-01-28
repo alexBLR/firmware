@@ -1,0 +1,24 @@
+<div class="onpay payCardInfo">
+    <form method="post" action="/request/">
+        <table cellpadding="2" cellspacing="0" border="0">
+            <tr>
+                <td align="right">
+                    Сумма:
+                </td>
+                <td>
+                    <input type="text" name="sum" value="">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" class="btn" name="submit" value="Оставить заявку">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div class="errorBox">
+    {% if error == 1 %}
+        <span>{{ errorText }}</span>
+    {% endif %}
+</div>

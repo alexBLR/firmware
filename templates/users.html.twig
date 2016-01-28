@@ -1,0 +1,216 @@
+{% extends 'base.html.twig' %}
+{% block title %} Private office {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+
+    <div class="content">
+        {% include 'menu.html.twig' %}
+        <div class="error">{{ error }}</div>
+        <div class="addUser">
+            <form action="addLogin" method="POST">
+                <input type="hidden" name="confirm" value="1">
+
+                <div>
+                    <label for="login">Email:</label>
+                    <input type="text" id="login" name="add_login" placeholder="Login" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="add_password" placeholder="Password" required>
+                </div>
+                <div>
+                    <button id="confirm" class="btn">add user</button>
+                </div>
+            </form>
+        </div>
+        <div style="margin-top: 20px;">
+            <table class="usersTable row-fluid" style="width:880px" id="userTable">
+                <thead>
+                <th></th>
+                <th>Login</th>
+                <th></th>
+                <th>Amount in the account</th>
+                <th>Status</th>
+                <th>Group</th>
+                <th></th>
+                </thead>
+                <tbody>
+                {% for item in users %}
+                    <tr class="tableTr" data-id="{{ item.id }}">
+                        <td>
+                            {% if item.pays == 1 %}
+                                {{ item.paySum }}$
+                                <img src="/images/details_open.png">
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ item.login }}
+                            {% if role == 1 %}
+                                <br>
+                                <span style="font-size: 10pt; font-weight: bold;">New password:</span>
+                                <input type="text" value="" id="pass{{ item.id }}">
+                                <br>
+                                <button type="button" class="btn save-new-password" data-id="{{ item.id }}">Save
+                                </button>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.credit == 0 %}
+                                <a href="#" class="btn" rel="popover" data-placement="right"
+                                   data-content="<form method='post' action='/users/setCredit' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/><input type='text' name='amount'></input><button type='submit' class='btn'>Add</button>"
+                                   data-original-title="">Credit</a>
+                            {% else %}
+                                <span>Credit: -{{ item.summaCredit }}</span>
+                                <a href="#" class="btn" rel="popover" data-placement="right"
+                                   data-content="<form method='post' action='/users/deleteCredit' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/></input><button type='submit' class='btn'>Delete credit</button>"
+                                   data-original-title="">Del</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.summa }}$ <a href="#" class="btn" rel="popover" data-placement="right"
+                                                 data-content="<form method='post' action='/users/AddBalance' class='form-inline'><input type='hidden' name='UserId' value='{{ item.id }}'/><input type='text' name='amount'></input><button type='submit' class='btn'>Add</button>"
+                                                 data-original-title="">+</a></td>
+                        <td>
+                            <form method='post' action='/users/setStatus'>
+                                <input type='hidden' name='user_id' value='{{ item.id }}'/>
+                                <select id="status" name="status" style="width:133px">
+                                    <option value="0"  {% if item.status == 0 %} selected {% endif %}>
+                                        Пользователь
+                                    </option>
+                                    {% if role == 1 or role == 3%}
+                                        <option value="2"  {% if item.status == 2 %} selected {% endif %}>
+                                            Менеджер
+                                        </option>
+                                    {% endif %}
+                                    {% if role == 1 %}
+                                        <option value="3"  {% if item.status == 3 %} selected {% endif %}>
+                                            Супер менеджер
+                                        </option>
+                                    {% endif %}
+                                </select>
+                                {% if role == 1 %}
+                                    <button type='submit' class='btn'>save</button>
+                                {% endif %}
+                            </form>
+                        </td>
+                        <td>
+                            <form method='post' action='/users/setGroup'>
+                                <input type='hidden' name='userId' value='{{ item.id }}'/>
+                                <select id="groups" name="groups" style="width:100px">
+                                    {% for group in groups %}
+                                        <option value="{{ group.id }}"  {% if item.group == group.id %} selected {% endif %}>{{ group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type='submit' class='btn'>save</button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if item.role != 1 %}
+                                <form method='post' action='/users/deleteUser' onSubmit="if(!confirm('Are you sure?')){return false;}">
+                                    <input type='hidden' name='userId' value='{{ item.id }}'/>
+                                    <button type='submit' class='btn'>Delete</button>
+                                </form>
+                            {% endif %}
+                            {% if item.status == 2 %}
+                                <a href="#" class="btn clients" rel="popover" data-placement="left"
+                                   data-content="{% for client in item.clients %}{{ client.login }}<br>{% endfor %}"
+                                   data-original-title="">Clients</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        function fnFormatDetails(nTr) {
+            var aData = oTable.fnGetData(nTr);
+            var id = $(nTr).data('id');
+            var sOut = '';
+            $.ajax({
+                type: 'POST',
+                url: '/users/getPay',
+                async: false,
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                    sOut = data;
+
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {id: id}
+            });
+            return sOut;
+        }
+
+        $(".clients").click(function () {
+            $(".popover").hide();
+        });
+
+        $(".save-new-password").bind("click", function () {
+            $.ajax({
+                type: 'POST',
+                url: '/users/setPassword',
+                async: true,
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                    $("#pass" + $(this).data('id')).val('');
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {
+                    id: $(this).data('id'),
+                    pass: $("#pass" + $(this).data('id')).val()
+                }
+            });
+        });
+
+
+        $(document).ready(function () {
+            oTable = $('#userTable').dataTable({
+                "sDom": '<"top"if>',
+                "bPaginate": false,
+                "aoColumns": [
+                    {"sClass": "center", "bSortable": false},
+                    {"sClass": "center", "bSortable": true},
+                    {"sClass": "center", "bSortable": false},
+                    {"sClass": "center", "bSortable": false},
+                    {"sClass": "center", "bSortable": false},
+                    {"sClass": "center", "bSortable": false},
+                    {"sClass": "center", "bSortable": false}
+                ],
+                "aaSorting": [[1, 'asc']]
+            });
+
+            $('#userTable tbody td img').live('click', function () {
+                var nTr = $(this).parents('tr')[0];
+                if (oTable.fnIsOpen(nTr)) {
+                    /* This row is already open - close it*/
+                    this.src = "/images/details_open.png";
+                    oTable.fnClose(nTr);
+                }
+                else {
+                    /* Open this row */
+                    this.src = "/images/details_close.png";
+                    oTable.fnOpen(nTr, fnFormatDetails(nTr), 'details');
+                }
+            });
+
+            $("a[rel=popover]").popover({
+                offset: 10,
+                trigger: 'focus',
+                html: true,
+                toggle: 'enabled'
+            }).click(function (e) {
+                $(this).popover('show')
+                e.preventDefault()
+            });
+        });
+
+
+    </script>
+{% endblock %}

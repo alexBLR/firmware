@@ -1,0 +1,337 @@
+{% extends 'base.html.twig' %}
+{% block title %} Личный кабинет {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+    <div class="content">
+        {% include 'menu.html.twig' %}
+        <div style="color: red; font-size: 25px; font-weight: bold;">Sorry for the technical problems. We are trying to solve the problem</div>
+        <div style="color: red; font-size: 25px; font-weight: bold;">Извините за технические неполадки. Мы пытаемся решить проблему</div>
+        <div class="vendors row-fluid">
+            <div class="span3">
+                <span class="title">Create firmware</span>
+                <select id="vendor">
+                    <option value="0">Choose manufacturer</option>
+                    {% for item in vendors %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if role == 1 %}
+                    <input type="text" placeholder="Input manufacturer" id="vendorAdd">
+                    <button id="addVendor" class="btn add">Add</button>
+                    <br>
+                {% endif %}
+                <select id="model">
+                    <option value="0">Choose model</option>
+                </select>
+                {% if role == 1 %}
+                    <button id="deleteModel" class="btn-danger add" style="margin-bottom: 5px;">Delete</button><br>
+                    <script type="text/javascript">
+                        $("#deleteModel").click(function() {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/apiajax/',
+                                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                                success: function (data) {
+                                    requestAjaxGet($("#vendor").val(), 4);
+                                }, error: function (xhr, textStatus, errorThrown) {
+
+                                }, data: {action: 8, vendor: $("#vendor").val(), model: $("#model").val()}
+                            });
+                        });
+                    </script>
+                {% endif %}
+                {% if role == 1 %}
+                    <input type="text" placeholder="Input model" id="modelAdd">
+                    <button id="addModel" class="btn add">Add</button>
+                    <br>
+                {% endif %}
+                <select id="firmware">
+                    <option value="1">Choose firmware</option>
+                </select>
+                {% if role == 1 %}
+                <button id="deleteFirmware" class="btn-danger add" style="margin-bottom: 5px;">Delete</button><br>
+                <script type="text/javascript">
+                    $("#deleteFirmware").click(function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/apiajax/',
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            success: function (data) {
+                                requestAjaxGet($("#models").val(), 5);
+                            }, error: function (xhr, textStatus, errorThrown) {
+
+                            }, data: {action: 7, vendor: $("#vendor").val(), model: $("#model").val(), firmware: $("#firmware").val()}
+                        });
+                    });
+                </script>
+                {% endif %}
+                {% if role == 1 %}
+                    <input type="text" placeholder="Input firmware" id="firmwareAdd">
+                    <label for="serialAdd"><input type="checkbox" id="serialAdd" class="checkbox" value="1"
+                                                  style="margin-bottom: 6px; margin-right: 5px;">Serial</label>
+                    <label for="crumAdd"><input type="checkbox" id="crumAdd" class="checkbox" value="1"
+                                                style="margin-bottom: 6px; margin-right: 5px;">CRUM</label>
+                    <button id="addFirmware" class="btn add">Add</button>
+                {% endif %}
+                <br>
+                <input type="text" placeholder="serial number" id="serial" maxlength="0"><br>
+                <input type="text" placeholder="CRUM" id="crum" maxlength="0"><br>
+                <span id="helpText" class="helpText">
+
+                </span><br>
+                <select id="teable">
+                    <option value="1">Updateable</option>
+                    <option value="2">Not updateable</option>
+                </select><br>
+                <img src="/images/ajax-loader.gif" id="createPreload" style="display: none;">
+                <span id="createError" style="display: none; color:red;"></span>
+                <span>Price firmware: {{ price }} $</span>
+                {% if price <= summa or credit == 1 %}<button id="createFirmware" class="btn-danger add">Order</button>
+                {% else %}
+                    <span>top up the balance</span>
+                {% endif %}
+            </div>
+            <div class="span9">
+                <div class="firmwares" id="firmwares">
+                    <img src="/images/ajax-loader.gif" id="firmwarePreload" style="display: none;">
+                    <table class="firmwareList" id="firmwareList" style="width:850px">
+						<thead>
+							<th>Date</th>
+							<th>Firmware</th>
+							<th>Price</th>
+							<th>Download</th>
+						</thead>
+                        <tbody>
+                        {% for item in logs %}
+                            <tr class="tableTr">
+                                <td>{{ item.date }}</td>
+                                <td>{{ item.name }} 
+									<b>{{ item.type }}</b>
+								</td>
+                                <td>{{ item.price }}</td>
+                                <td>
+                                    <a class="btn" href="/{{ item.file }}">
+                                        Download
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+
+    <script type="text/javascript">
+        $("#serial").hide();
+        $("#crum").hide();
+
+        $("#addVendor").click(function () {
+            requestAjax($("#vendorAdd").val(), 1);
+        });
+        $("#addModel").click(function () {
+            if ($("#vendor").val() == 0) {
+                alert('Не выбран производитель');
+            } else {
+                requestAjax($("#modelAdd").val(), 2);
+            }
+        });
+        $("#addFirmware").click(function () {
+            if ($("#vendor").val() == 0) {
+                alert('Не выбран производитель');
+            } else {
+                requestAjax($("#firmwareAdd").val(), 3);
+            }
+        });
+
+        $("#vendor").change(function () {
+            $("#createFirmware").prop('disabled',true);
+            $("#createPreload").show();
+            requestAjaxGet($("#vendor").val(), 4);
+        });
+
+        $("#model").change(function () {
+            $("#createFirmware").prop('disabled',true);
+            $("#createPreload").show();
+            requestAjaxGet($("#models").val(), 5);
+        });
+
+        $("#firmware").change(function () {
+            $("#createFirmware").prop('disabled',true);
+            $("#createPreload").show();
+            requestAjaxGet($("#firmware").val(), 6);
+        });
+
+        $("#createFirmware").click(function () {
+            var snlength = $("#serial").attr("maxLength");
+            if(snlength == 0) {
+                snlength = $("#crum").attr("maxLength");
+            }
+            var type = 0;
+
+            if($("#serial").css("display") == 'none') {
+                type = 2;
+            } else if ($("#crum").css("display") == 'none') {
+                type = 1;
+            } else {
+                type = 3;
+            }
+            console.log(type);
+            console.log($("#serial").val());
+            if($("#vendor").val() == 0) {
+                alert("Not select manufacturer!");
+            } else if($("#model").val() == 0) {
+                alert("Not select model!");
+            } else if ($("#firmware").val() == 0) {
+                alert("Not select firmware!");
+            } else if($("#serial").val() == '' && (type == 1 || type == 3)) {
+                alert("Do not enter serial number!");
+            } else if ($("#serial").val().length != snlength && (type == 1 || type == 3) && snlength > 0) {
+                alert("The serial number must consist of " + snlength + " characters");
+            } else if ($("#crum").val() == 'undefined' && (type == 2 || type == 3)) {
+                alert("Do not enter CRUM!");
+            } else if ($("#crum").val().length != snlength && type == 2) {
+                alert("The CRUM must consist of " + snlength + " characters!");
+            } else if ($("#crum").val().length != 11 && type == 3) {
+                alert("The CRUM must consist of 11 characters!");
+            } else {
+                $("#firmwarePreload").show();
+                $("#firmwareList").hide();
+                $("#createError").hide();
+                createFirmware();
+            }
+        });
+
+        function createFirmware() {
+            $.ajax({
+                type: 'POST',
+                url: '/createFirmware/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                    if(data == 3) {
+                        $("#firmwarePreload").hide();
+                        $("#firmwareList").show();
+                        $("#createError").html('For the serial number firmware has already been created. Select it from the list of firmware');
+                        $("#createError").show();
+                    } else {
+                        getFirmware();
+                        var theTable = $('table.firmwareList');
+                        $("#firmwarePreload").hide();
+                        $("#firmwareList").show();
+                        $("#serial").val('');
+                        $("#crum").val('');
+                        $("#model [value='0']").attr("selected", "selected");
+                        $("#vendor [value='0']").attr("selected", "selected");
+                        $("#firmware [value='0']").attr("selected", "selected");
+                        $("#teable [value='1']").attr("selected", "selected");
+                    }
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {vendor: $("#vendor").val(), model: $("#model").val(), firmware: $("#firmware").val(), serial: $("#serial").val(), crum: $("#crum").val(), type: $("#teable").val() }
+            });
+        }
+
+        function getFirmware() {
+            $.ajax({
+                type: 'POST',
+                url: '/getFirmware/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                    $("#firmwares").html(data);
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }
+            });
+        }
+
+
+        function requestAjax(val, action) {
+            $.ajax({
+                type: 'POST',
+                url: '/apiajax/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {val: val, action: action, vendor: $("#vendor").val(), model: $("#model").val(), serial: $("#serialAdd").attr('checked'), crum: $("#crumAdd").attr('checked') }
+            });
+        }
+
+        function requestAjaxGet(val, action) {
+            $.ajax({
+                type: 'POST',
+                url: '/apiajax/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                success: function (data) {
+                    if (action == 4) {
+                        var sel = 'model';
+                    } else if (action == 5) {
+                        var sel = 'firmware';
+                    }
+
+                    if (action == 4 || action == 5) {
+
+                        $("#" + sel).html('');
+                        var mass = data.split(";");
+                        for (var i = 0; i < mass.length - 1; i++) {
+                            var tmp = mass[i].split('|');
+                            $("#" + sel).append('<option value="' + tmp[0] + '">' + tmp[1] + '</option>');
+
+                        }
+                    } else if (action == 6) {
+                        console.log(data.snlength);
+                        $('#serial').attr('maxLength', '');
+                        $('#crum').attr('maxLength', '');
+                        if (data.type == 1) {
+                            $("#serial").show();
+                            $('#serial').attr('maxLength', data.snlength);
+                            $("#crum").hide();
+                        } else if (data.type == 2) {
+                            $("#crum").show();
+                            $('#crum').attr('maxLength', data.snlength);
+                            $("#serial").hide();
+                        } else {
+                            $("#serial").show();
+                            $('#serial').attr('maxLength', data.snlength);
+                            $("#crum").show();
+                        }
+                        $("#helpText").html(data.comment);
+                    }
+                    $("#createFirmware").prop('disabled',false);
+                    $("#createPreload").hide();
+                }, error: function (xhr, textStatus, errorThrown) {
+
+                }, data: {val: val, action: action, vendor: $("#vendor").val(), model: $("#model").val(), firmware: $("#firmware").val()}
+            });
+        }
+
+		$(document).ready(function () {
+		
+			oTable = $('#firmwareList').dataTable({
+				"sDom": '<"top"<"header_table">ifp>',
+				"sPaginationType": "full_numbers",
+				"bPaginate": true,
+				"aoColumns": [
+					{ "sClass": "center", "bSortable": true },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+				],
+				 "aaSorting": [[0, 'desc']]
+			});
+			$(".header_table").html('');
+		});
+
+    </script>
+
+{% endblock %}

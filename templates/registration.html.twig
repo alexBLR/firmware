@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block title %} Registration {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+    <body onload="initialize()">
+    <div class="loginContent" style="width:100%; height:100%">
+        <div style="height:250px">&nbsp;</div>
+        <h4 class="text-info">Registration</h4>
+        <div class="error">{{ error }}</div>
+        <div class="loginForm">
+            <form action="/setRegistration/" method="POST">
+                <input type="hidden" name="confirm" value="1">
+                <div>
+                    <label for="loginReg">Email:</label>
+                    <input type="text" id="loginReg" name="loginReg" placeholder="Login" required>
+                </div>
+                <div>
+                    <label for="passwordReg">Password:</label>
+                    <input type="password" id="passwordReg" name="passwordReg" placeholder="Password" required>
+                </div>
+                <div>
+                    <button id="confirm" class="btn">Sign up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </body>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+    </script>
+{% endblock %}

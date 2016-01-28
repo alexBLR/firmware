@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% block title %} Private office {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+    <div class="content">
+        {% include 'menu.html.twig' %}
+
+        {% if role == 1 %}
+        <div class="groups">
+            <form id="settings_form">
+            <table class="vendors row-fluid table table-bordered" id="settings" style="width:450px">
+                <thead>
+                <th>Username</th>
+                <th>Password</th>
+                </thead>
+                <tbody>
+                {% for item in settings %}
+                    <tr>
+                        <td><input name="username_{{ item.id }}" value="{{ item.username }}"></td>
+                        <td><input name="password_{{ item.id }}" value="{{ item.password }}"></td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2">
+                        <button class="btn btn-success" type="button" id="save">Save</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script type="text/javascript">
+            $("#save").on("click", function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/settings/save/',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: $("#settings_form").serialize(),
+                    success: function (data) {
+                        
+                    }, error: function (xhr, textStatus, errorThrown) {
+
+                    }
+                });
+
+            });
+        </script>
+    {% endblock %}
+
+
+
+

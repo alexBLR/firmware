@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+{% block title %} Private office {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+{% block body %}
+    <div class="content">
+        {% include 'menu.html.twig' %}
+        <div class="groups">
+            {% if role != 0 %}
+            {% if role == 1 %}
+                <form action="setMessage" method="post">
+                <label>Global message</label>
+                <textarea name="message" class="form-control" rows="3" style="height: 100px !important; width: 800px !important;">
+                    {{ global_message }}
+                </textarea>
+                    <button type="submit" class="btn">Update</button>
+                </form>
+            {% endif %}
+            <form method='post' id="form_new_group" action='/groups/addGroup'>
+                <span class="title">Add price</span>
+                <input type='text' name='name'>
+                <button type='submit' class='btn'>Add</button>
+                {% endif %}
+                <span style="font-weight: bold; color: red; font-size: 14pt;">{{ global_message }}</span>
+                <label><b id="showTitle">Show table</b></label>
+
+                <div id="addPriceDiv">
+                    <table class="table" id="addPriceTable">
+                        <thead>
+                        <tr>
+                            <td>Manufacturer</td>
+                            <td>Model</td>
+                            <td>Firmware</td>
+                            <td>Price</td>
+                            {% if role == 0 %}
+                                <td>Description</td>
+                            {% endif %}
+                            {% if role != 0 %}
+                                <td>Hide firmware</td>{% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in available_firmwares %}
+                            <tr>
+                                <input name="fid[]" value="{{ item.fid }}" type="hidden">
+                                <td>{{ item.vendor }}</td>
+                                <td>{{ item.model }}</td>
+                                <td>{{ item.firmware }}</td>
+                                <td>
+                                    {% if role != 0 %}<input value="{{ item.price|default(0) }}" name="price[{{ item.fid }}]" type="text"
+                                           style="width: 50px">{% endif %}
+                                    {% if role == 0 %}{{ item.price|default(0) }}{% endif %}
+                                </td>
+                                {% if role == 0 %}
+                                <td>{{ item.description }}</td>
+                                {% endif %}
+                                {% if role != 0 %}
+                                    <td><input type="checkbox" name="enabled[{{ item.fid }}]" value="1"></td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% if role !=0 %}</form>{% endif %}
+        </div>
+
+        {% if role != 0 %}
+            <div class="groups">
+                <table class="vendors row-fluid table table-bordered" id="groups" style="width:450px">
+                    <thead>
+                    <th>Name</th>
+                    <th>Price firmware</th>
+                    </thead>
+                    <tbody>
+                    {% for item in groups %}
+                        <tr class="tableTr">
+                            <td width="100px">
+                                {{ item.name }}
+                                <label><b class="show" data-price="{{ item.id }}">Show</b></label>
+                            </td>
+                            <td width="150px">
+                                {% if item.id != 2 %}
+                                    <form method='post' action='/groups/deleteGroup'>
+                                        <input type='hidden' name='groupId' value='{{ item.id }}'/>
+                                        <button type='submit' class='btn'>Delete</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div id="price_{{ item.id }}" style="display: none;">
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var oTable = $("#addPriceTable").dataTable({
+                "sPaginationType": "full_numbers",
+                "bPaginate": false
+            });
+
+            $("div").on("input", ".change_price",  function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/groups/changePrice',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: {
+                        id: $(this).data('id'),
+                        value: $(this).val()
+                    },
+                    success: function (data) {
+
+                    }, error: function (xhr, textStatus, errorThrown) {
+
+                    }
+                });
+            });
+
+            $("div").on("click", ".change_enabled", function() {
+                var value = 0;
+                if ($(this).is(":checked")) {
+                    value = 1;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/groups/changeEnabled',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: {
+                        id: $(this).data('id'),
+                        value: value
+                    },
+                    success: function (data) {
+
+                    }, error: function (xhr, textStatus, errorThrown) {
+
+                    }
+                });
+            });
+
+
+            $("#showTitle").on("click", function () {
+                $("#addPriceDiv").toggle("slow", function () {
+
+                });
+            });
+
+            $(".show").on("click", function () {
+                var id = $(this).data('price');
+                $.ajax({
+                    type: 'POST',
+                    url: '/groups/showPrice',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        $("#price_" + id).html(data);
+                        $("#price_" + id).toggle("slow", function () {});
+                    }, error: function (xhr, textStatus, errorThrown) {
+
+                    }
+                });
+
+            });
+
+
+            $("a[rel=popover]").popover({
+                offset: 10,
+                trigger: 'focus',
+                html: true,
+                toggle: 'enabled'
+            }).click(function (e) {
+                e.preventDefault()
+            });
+        });
+    </script>
+{% endblock %}
+
+
+
+

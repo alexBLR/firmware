@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title %} Order firmware {% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        {% include 'menu.html.twig' %}
+        <div class="logsList" style="margin-left: auto; margin-top: auto; margin-top: 20px">
+            {% if role == 1 %}
+            Summa from logs: <b>{{ summaLogs }}</b>
+            {% endif %}
+            <div class="firmwaresList" id="firmwares">
+                <table class="firmwareList" id="firmwareList" style="width:960px">
+					<thead>
+						<th>Login</th>
+						<th>Date</th>
+						<th>Firmware</th>
+						<th>Price</th>
+						<th>Download</th>
+					</thead>
+					<tbody>
+                    {% for item in logs %}
+                        <tr class="tableTr">
+                            <td width="180px" style="text-align: left;"><b>{{ item.login }}</b></td>
+                            <td width="160px" style="text-align: left;"><b>{{ item.date }}</b></td>
+                            <td width="490px" style="text-align: left;">{{ item.name }} <b>{{ item.type }}</b></td>
+                            <td width="50px">{{ item.price }}</td>
+                            <td>
+                                <a class="btn" href="/{{ item.file }}">
+                                    Download
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+			oTable = $('#firmwareList').dataTable({
+				"sDom": '<"top"<"header_table">ifp>',
+				"sPaginationType": "full_numbers",
+				"bPaginate": true,
+				"aoColumns": [
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": true },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+					{ "sClass": "center", "bSortable": false },
+				],
+				 "aaSorting": [[1, 'desc']]
+			});
+		});	
+    </script>
+{% endblock %}

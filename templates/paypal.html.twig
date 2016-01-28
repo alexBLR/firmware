@@ -1,0 +1,40 @@
+<div class="title">Оплата производится через систему PayPal</div>
+<div id="cards">
+
+    <form action="/order/" method="post">
+        <div class="payCardInfo"><input type="radio" name="cards" class="btn" value="1"
+                                        checked>PayPal<br>
+            <input type="radio" name="cards" class="btn" value="2">Visa<br>
+            <input type="radio" name="cards" class="btn" value="3">MasterCard<br>
+
+            <div class="text-info">Номер банковской карты:</div>
+            <input type="text" id="cardNumber" name="ACCT"><br>
+
+            <div class="text-info">Дата истечения срока работы карты:</div>
+            <input type="text" id="dateExpiriens" name="EXPDATE"><br>
+
+            <div class="text-info">Защитный код:</div>
+            <input type="text" id="code" name="CVV2"><br>
+
+            <div class="text-info">Имя:</div>
+            <input type="text" id="firstname" name="firstname"><br>
+
+            <div class="text-info">Фамилия:</div>
+            <input type="text" id="lastname" name="lastname"><br>
+
+            <div class="text-info">Город:</div>
+            <input type="text" id="city" name="city"><br>
+
+            <div class="text-info">Штат:</div>
+            <input type="text" id="state" name="state"><br>
+
+            <div class="text-info">Код страны:</div>
+            <input type="text" id="countrycode" name="countrycode"><br>
+
+            <div class="text-info">Почтовый индекс:</div>
+            <input type="text" id="zip" name="zip"><br>
+
+        </div>
+        <button id="confirm" class="btn">Оплатить</button>
+    </form>
+</div>

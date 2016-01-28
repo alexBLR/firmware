@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block title %} Доступные прошивки {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <div class="firmwares" style="margin-top: 20px">
+        <input type="text" id="filter" class="input-prepend filter" placeholder="Search...">
+        <table class="firmwares row-fluid" style="width:600px">
+            <tr>
+                <td>Manufacturer</td>
+                <td>Model</td>
+                <td>Firmware</td>
+            </tr>
+            {% for item in firmwares %}
+                <tr class="tableTr">
+                    <td>{{ item.vendor }}</td>
+                    <td>{{ item.model }}</td>
+                    <td>{{ item.firmware }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var theTable = $('table.firmwares')
+
+            $("#filter").keyup(function () {
+                var t = $.uiTableFilter(theTable, this.value, 0);
+                //console.log(t);
+            })
+        });
+    </script>
+{% endblock %}

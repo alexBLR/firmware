@@ -1,0 +1,29 @@
+<table class="firmwareList" id="firmwareList" style="width:850px">
+    <thead>
+    <th>Date</th>
+    <th>Firmware</th>
+    <th>Price</th>
+    <th>Download</th>
+    </thead>
+    <tbody>
+    {% for item in logs %}
+        <tr class="tableTr">
+            <td>{{ item.date }}</td>
+            <td>{{ item.name }} <b>{{ item.type }}</b></td>
+            <td>{{ item.price }}</td>
+            <td>
+                {% if item.from == 4 %}
+                    Link in email or <br>
+                    {% if item.status == 1 and item.email_links is not empty %}
+                        <span data-link="{{ item.email_links }}" class="email_links" style="font-weight: bold; cursor: pointer;">show links</span>
+                    {% endif %}
+                {% else %}
+                <a class="btn" href="/{{ item.file }}">
+                    Download
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

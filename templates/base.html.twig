@@ -1,0 +1,29 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <link type="text/css" rel="stylesheet" href="/vendor/components/bootstrap/css/bootstrap.css">
+    <link type="text/css" rel="stylesheet" href="/css/jquery.dataTables.css">
+	<link type="text/css" rel="stylesheet" href="/css/main.css">
+    <script type="text/javascript" src="/js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/fnGetNode.js"></script>
+    <script type="text/javascript" src="/vendor/components/bootstrap/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/vendor/components/bootstrap/js/bootstrap-twipsy.js"></script>
+    <script type="text/javascript" src="/vendor/components/bootstrap/js/bootstrap-popover.js"></script>
+	<style type="text/css" rel="stylesheet">
+	.fade {
+		opacity: 1
+	}
+	</style>
+</head>
+<body>
+{% block body %}
+{% endblock %}
+{% block footer %}
+    {% include 'footer.html.twig' %}
+{% endblock %}
+{% block javascripts %}
+    <script type="text/javascript" src="/js/jquery.uitablefilter.js"></script>
+{% endblock %}
+</body>
+</html>

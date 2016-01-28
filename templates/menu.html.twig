@@ -1,0 +1,39 @@
+<div class="menu row-fluid">
+    <div class="mm span1">
+        <div class="logout"><a href="/logout/">Logout</a>&nbsp;</div>
+    </div>
+    <div class="span1">
+        <div class="group"><a href="/">Gen. page</a></div>
+    </div>
+    {% if role == 1 or role == 2 or role == 3 %}
+        <div class="span1">
+            <div class="users"><a href="/users/">Users</a></div>
+        </div>
+    {% endif %}
+    <div class="span1">
+        {% if role == 1 or role == 2 or role == 3 %}
+            <div class="group"><a href="/groups/">Groups</a></div>{% endif %}
+        {% if role == 0 %}
+            <div class="group"><a href="/groups/">Price</a></div>{% endif %}
+    </div>
+    {% if role == 1 or role == 2 or role == 3 %}
+        <div class="span1">
+            <div class="logs"><a href="/logs/">Logs</a></div>
+        </div>
+    {% endif %}
+    {% if role == 1 %}
+        <div class="span1">
+            <div class="logs"><a href="/firmwares/">Firmares</a></div>
+        </div>
+    {% endif %}
+    {% if role == 1 %}
+        <div class="span1">
+            <div class="logs"><a href="/settings/">Settings</a></div>
+        </div>
+    {% endif %}
+    <div class="loginTitle {% if role == 1 or role == 2 or role == 3 %} span5 {% else %} span9 {% endif %}">
+        <span class="hello">Hello, <b>{{ login }}</b></span>
+        <span class="firmwareCount">Count firmware: <b>{{ firmwareCount | default(0) }}</b></span>
+        <span class="deposit">Amount in the account: <b>{{ summa | default(0) }}</b></span>
+    </div>
+</div>
