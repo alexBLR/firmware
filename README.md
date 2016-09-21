@@ -2,6 +2,10 @@
 
 Join 25,000 astounded readers and follow us down below!
 
+Nicole lost 71 pounds on keto
+
+{Keto Success Series}[http://www.ketogeniclab.com/keto-success-series-nicole]
+
 {Ketogenic Lab}[http://www.ketogeniclab.com/]
 
 We wrote the ultimate guide to ketgenic vegetables
